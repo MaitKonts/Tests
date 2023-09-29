@@ -55,6 +55,7 @@ public class WorldManager : MonoBehaviour
             }
         }
     }
+
     public void SaveWorld()
     {
         // Check if a world name is set
@@ -73,8 +74,15 @@ public class WorldManager : MonoBehaviour
             PlayerPrefs.SetString(currentWorldName + "_Chunk_" + chunkCoord.x + "_" + chunkCoord.y, chunkData);
         }
 
-        // Save the world name
-        PlayerPrefs.SetString("CurrentWorld", currentWorldName);
+        // Save the current world name to the list of saved worlds
+        string savedWorlds = PlayerPrefs.GetString("SavedWorlds", "");
+        List<string> worldsList = new List<string>(savedWorlds.Split(','));
+        if (!worldsList.Contains(currentWorldName))
+        {
+            worldsList.Add(currentWorldName);
+            PlayerPrefs.SetString("SavedWorlds", string.Join(",", worldsList));
+        }
+
     }
 
     public void LoadWorld()
@@ -102,5 +110,13 @@ public class WorldManager : MonoBehaviour
                 chunk.LoadChunk(chunkData);
             }
         }
+    }
+
+    public List<string> GetSavedWorlds()
+    {
+        string savedWorlds = PlayerPrefs.GetString("SavedWorlds", "");
+        List<string> worldsList = new List<string>(savedWorlds.Split(','));
+        worldsList.RemoveAll(string.IsNullOrEmpty); // Remove any empty strings
+        return worldsList;
     }
 }
